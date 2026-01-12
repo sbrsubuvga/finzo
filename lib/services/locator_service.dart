@@ -12,8 +12,16 @@ final getIt = GetIt.instance;
 
 Future<void> setupLocator() async {
   // Initialize and register DatabaseManager
-  final db = await DatabaseService.database;
-  getIt.registerSingleton<DatabaseManager>(db);
+  // Note: Web debug server starts asynchronously and won't block initialization
+  try {
+    final db = await DatabaseService.database;
+    getIt.registerSingleton<DatabaseManager>(db);
+    print('Database initialized successfully');
+    print('Web debug UI available at: http://localhost:4800');
+  } catch (e) {
+    print('Database initialization error: $e');
+    rethrow;
+  }
 
   // Register Repositories
   getIt.registerLazySingleton<TransactionRepository>(
@@ -48,11 +56,19 @@ Future<void> setupLocator() async {
     () => GoogleDriveService(),
   );
 
-  // Initialize default categories if needed
-  final categoryRepo = getIt<CategoryRepository>();
-  if (!(await categoryRepo.hasDefaultCategories())) {
-    await categoryRepo.createDefaultCategories();
-  }
+  // Initialize default categories asynchronously after app starts
+  // This prevents blocking the main thread during initialization
+  Future.microtask(() async {
+    try {
+      final categoryRepo = getIt<CategoryRepository>();
+      if (!(await categoryRepo.hasDefaultCategories())) {
+        await categoryRepo.createDefaultCategories();
+      }
+    } catch (e) {
+      // Log error but don't block initialization
+      print('Error initializing default categories: $e');
+    }
+  });
 }
 
 // Helper function to get registered instances

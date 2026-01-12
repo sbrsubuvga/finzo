@@ -16,9 +16,10 @@ import 'screens/settings/backup_restore_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Setup dependency injection
+  // Setup dependency injection - this must succeed for the app to work
   await setupLocator();
   
+  // Run the app
   runApp(const MyApp());
 }
 
@@ -131,7 +132,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   SizedBox(height: 8),
-                  Text(
+            Text(
                     'Income & Expense Tracker',
                     style: TextStyle(
                       color: Colors.white70,
