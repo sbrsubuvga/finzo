@@ -17,7 +17,6 @@ Future<void> setupLocator() async {
     final db = await DatabaseService.database;
     getIt.registerSingleton<DatabaseManager>(db);
     print('Database initialized successfully');
-    print('Web debug UI available at: http://localhost:4800');
   } catch (e) {
     print('Database initialization error: $e');
     rethrow;
